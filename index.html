@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animated Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #dfe9f3, #ffffff);
+    }
+    .calculator {
+      width: 320px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      animation: fadeIn 1s ease;
+    }
+    .display {
+      background: #222;
+      color: #0f0;
+      text-align: right;
+      padding: 20px;
+      font-size: 2em;
+      letter-spacing: 1px;
+      min-height: 60px;
+      overflow-x: auto;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 15px;
+    }
+    button {
+      padding: 20px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 12px;
+      background: #f4f4f4;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.15s ease, background 0.3s ease;
+    }
+    button:hover {
+      background: #e0e0e0;
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+    .operator {
+      background: #ffb84d;
+    }
+    .operator:hover {
+      background: #ff9900;
+    }
+    .equals {
+      background: #4caf50;
+      grid-column: span 2;
+      color: white;
+    }
+    .equals:hover {
+      background: #43a047;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+      <button onclick="clearDisplay()">AC</button>
+      <button onclick="toggleSign()">±</button>
+      <button onclick="percent()">%</button>
+      <button class="operator" onclick="setOperator('/')">÷</button>
+
+      <button onclick="appendNumber('7')">7</button>
+      <button onclick="appendNumber('8')">8</button>
+      <button onclick="appendNumber('9')">9</button>
+      <button class="operator" onclick="setOperator('*')">×</button>
+
+      <button onclick="appendNumber('4')">4</button>
+      <button onclick="appendNumber('5')">5</button>
+      <button onclick="appendNumber('6')">6</button>
+      <button class="operator" onclick="setOperator('-')">−</button>
+
+      <button onclick="appendNumber('1')">1</button>
+      <button onclick="appendNumber('2')">2</button>
+      <button onclick="appendNumber('3')">3</button>
+      <button class="operator" onclick="setOperator('+')">+</button>
+
+      <button onclick="appendNumber('0')" style="grid-column: span 2">0</button>
+      <button onclick="appendDot()">.</button>
+      <button class="equals" onclick="calculate()">=</button>
+    </div>
+  </div>
+
+  <script>
+    let display = document.getElementById('display');
+    let currentInput = '0';
+    let operator = null;
+    let previousInput = null;
+
+    function updateDisplay() {
+      display.textContent = currentInput;
+    }
+
+    function appendNumber(num) {
+      if (currentInput === '0' || operator && previousInput === null) {
+        currentInput = num;
+      } else {
+        currentInput += num;
+      }
+      updateDisplay();
+    }
+
+    function appendDot() {
+      if (!currentInput.includes('.')) {
+        currentInput += '.';
+        updateDisplay();
+      }
+    }
+
+    function clearDisplay() {
+      currentInput = '0';
+      operator = null;
+      previousInput = null;
+      updateDisplay();
+    }
+
+    function toggleSign() {
+      if (currentInput !== '0') {
+        currentInput = currentInput.startsWith('-') ? currentInput.slice(1) : '-' + currentInput;
+        updateDisplay();
+      }
+    }
+
+    function percent() {
+      currentInput = (parseFloat(currentInput) / 100).toString();
+      updateDisplay();
+    }
+
+    function setOperator(op) {
+      if (previousInput === null) {
+        previousInput = currentInput;
+      } else if (operator) {
+        calculate();
+      }
+      operator = op;
+      currentInput = '0';
+    }
+
+    function calculate() {
+      if (operator === null || previousInput === null) return;
+      let result;
+      const prev = parseFloat(previousInput);
+      const current = parseFloat(currentInput);
+      switch (operator) {
+        case '+':
+          result = prev + current;
+          break;
+        case '-':
+          result = prev - current;
+          break;
+        case '*':
+          result = prev * current;
+          break;
+        case '/':
+          result = current === 0 ? 'Error' : prev / current;
+          break;
+        default:
+          return;
+      }
+      currentInput = result.toString();
+      operator = null;
+      previousInput = null;
+      updateDisplay();
+    }
+  </script>
+</body>
+</html>
